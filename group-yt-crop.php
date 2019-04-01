@@ -80,7 +80,7 @@ fclose($fp);
     <?php if (count($group->files) < 8) { continue; } ?>
     <tr>
         <td><a href="https://youtu.be/<?= $news->id ?>"><?= htmlspecialchars($news->title) ?></a>(<?= $news->id ?>)</td>
-        <td><?= sprintf("%02d:%02d", floor($group->start / 60), $group->start % 60) ?></td>
+        <td><?= sprintf("%02d:%02d(%d)", floor($group->start / 60), $group->start % 60, $group->start) ?></td>
         <td><?= sprintf("%02d:%02d", floor($group->end / 60), $group->end % 60) ?></td>
         <td title="<?= implode("\n", $group->diffs) ?>"><?= $group->end - $group->start + 1 ?></td>
         <td>
