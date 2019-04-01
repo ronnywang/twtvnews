@@ -5,6 +5,14 @@ if (!file_exists('ytcropmerges')) {
     mkdir('ytcropmerges');
 }
 
+$fp = fopen('skip-crop.csv', 'r');
+fgetcsv($fp);
+$skip_crop = array();
+while ($rows = fgetcsv($fp)) {
+    $skip_crop[$rows[0] . '&' . $rows[1]] = true;
+}
+fclose($fp);
+
 $channels = array(
     'ctitv' => array('crop' => '325x24+100+193'),
     'ebc' => array('crop' => '426x24+0+192'),
@@ -95,6 +103,9 @@ foreach ($channels as $channel => $channel_data) {
         foreach ($news_list as $news) {
             foreach ($news->groups as $group) {
                 if (count($group->files) < 8) {
+                    continue;
+                }
+                if (array_key_exists($news->id . '&' . $group->start, $skip_crop)) {
                     continue;
                 }
                 $files[] = 'ytcrops/' . $news->path . '/' . $group->files[0];
