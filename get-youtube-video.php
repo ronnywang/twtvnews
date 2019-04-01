@@ -26,8 +26,22 @@ $crawl_video = function($channel, $date, $video_id, $title){
     file_put_contents($dir . '/' . $date . '/list.csv', implode(',', array($video_id, $title)) . "\n", FILE_APPEND);
 };
 
-$output = fopen('php://output', 'w');
-fputcsv($output, array('頻道', '日期', '影片ID', '標題', '影片長度', '觀看人數', '網址'));
+// 先讀舊記錄
+$youtube_videos = array();
+
+if (file_exists('youtube.csv')) {
+    $fp = fopen('youtube.csv', 'r');
+    $columns = fgetcsv($fp);
+    while ($rows = fgetcsv($fp)) {
+        $values = array_combine($columns, $rows);
+        $youtube_videos[$values['影片ID']] = $values;
+    }
+    fclose($fp);
+}
+
+$output = fopen('youtube.csv', 'w');
+$columns = array('頻道', '日期', '影片ID', '標題', '影片長度', '觀看人數', '網址');
+fputcsv($output, $columns);
 foreach ($channels as $channel => $data) {
     $dir = __DIR__ . '/youtubes/' . $channel;
     if (!file_exists($dir)) {
@@ -79,7 +93,10 @@ foreach ($channels as $channel => $data) {
             }
             $view = str_replace(',', '', trim($view));
             $view = str_replace(' views', '', trim($view));
-            fputcsv($output, array($channel, $date, $video_id, $title, $duration, $view, 'https://youtu.be/' . $video_id));
+            $youtube_videos[$video_id] = array_combine(
+                $columns,
+                array($channel, $date, $video_id, $title, $duration, $view, 'https://youtu.be/' . $video_id)
+            );
         }
 
         $more_href = null;
@@ -107,3 +124,8 @@ foreach ($channels as $channel => $data) {
             . '</body></html>';
     }
 }
+
+foreach ($youtube_videos as $id => $values) {
+    fputcsv($output, array_values($values));
+}
+fclose($output);
