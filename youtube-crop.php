@@ -9,7 +9,7 @@ $channels = array(
     'ctitv' => array('crop' => '325x24+100+193'),
     'ebc' => array('crop' => '426x24+0+192'),
     'formosa' => array('crop' => '328x24+98+192'),
-    'set' => array('crop' => '334x28+92+188'),
+    'set' => array('crop' => '334x27+92+188'),
     'tvbs' => array('crop' => '292x23+106+191'),
 );
 
@@ -36,6 +36,7 @@ foreach ($channels as $channel_id => $channel_data) {
             }
 
             $screen_dir = 'tmp-screens';
+            system("rm -rf $screen_dir");
             mkdir($screen_dir);
 
             system(sprintf("ffmpeg -i %s -vf scale=426:240,fps=1 %s", escapeshellarg($ts_file), escapeshellarg($screen_dir . '/%010d.png')));
