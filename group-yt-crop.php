@@ -1,7 +1,7 @@
 <?php
 
 
-$channel = 'ctitv';
+$channel = $_GET['channel'] ?: 'ctitv';
 $date = $_GET['date'] ?: 20190327;
 
 $fp = fopen("youtubes/{$channel}/{$date}/list.csv", 'r');
