@@ -10,6 +10,33 @@ $(function(){
                 });
             });
         };
+
+
+        $.get('data.json', function(records){
+                for (var i = 0; i < records.length; i ++) {
+                    var record = records[i];
+                    var div_dom = $('<div></div>').addClass('group');
+                    div_dom.data('start', record.start);
+                    div_dom.data('end', record.end);
+                    div_dom.data('youtube-id', record['youtube-id']);
+                    div_dom.data('youtube-title', record['youtube-title']);
+
+                    div_dom.append($('<h1></h1>').text(get_time_string(record.start) + ' - ' + get_time_string(record.end)));
+                    if (record['youtube-id']) {
+                        div_dom.append($('<h2></h2>').text(record['youtube-date'] + '. ' + record['youtube-title'] + '(' + record['youtube-id'] + ')'));
+                    }
+
+                    if (!i) {
+                        div_dom.append($('<div></div>').append($('<img>').attr('src', record['img-file'])).append($('<img>').attr('src', record['crop-file'])));
+                    } else {
+                        div_dom.append($('<div></div>').addClass('lazyload').data('img', record['img-file']).data('crop', record['crop-file']));
+                    }
+
+                    $('#video').append(div_dom);
+                }
+
+        });
+
         var get_time_string = function(n){
             return ('00' + Math.floor(n / 60)).substr(-2) + ':' 
                  + ('00' + Math.floor(n % 60)).substr(-2);

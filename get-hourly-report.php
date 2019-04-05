@@ -50,7 +50,7 @@ foreach ($channels as $channel => $channel_data) {
             continue;
         }
         $target = "reports/{$channel}/{$yyyymmdd}";
-        if (file_exists($target . '/index.html')) {
+        if (file_exists($target . '/data.json')) {
             continue;
         }
         $screen_dir = "screens/{$channel}/{$yyyymmdd}.ts";
@@ -99,16 +99,12 @@ foreach ($channels as $channel => $channel_data) {
         };
 
         $draw_group = function($group, $idx) use ($get_time_from_filename, $target, $titles, $diff, $files_yt_id, $with_screen, $channel_data){
-            $content = sprintf('<div class="group" data-start="%d" data-end="%d" data-youtube-id="%s" data-youtube-title="%s">',
-                explode('.', basename($group->minute_files[0]))[0],
-                explode('.', basename($group->minute_files[count($group->minute_files) - 1]))[0],
-                htmlspecialchars($group->match_yt),
-                htmlspecialchars($group->match_yt ? $titles[$group->match_yt]['標題'] : '')
-            );
-            $content .= sprintf("<h1>%s - %s</h1>\n", $get_time_from_filename($group->minute_files[0]), $get_time_from_filename($group->minute_files[count($group->minute_files) - 1]));
-            if ($group->match_yt) {
-                $content .= sprintf("<h2>%s. %s(%s)</h2>\n", $titles[$group->match_yt]['日期'], $titles[$group->match_yt]['標題'], $group->match_yt);
-            }
+            $record = array();
+            $record['start'] = explode('.', basename($group->minute_files[0]))[0];
+            $record['end'] = explode('.', basename($group->minute_files[count($group->minute_files) - 1]))[0];
+            $record['youtube-id'] = $group->match_yt;
+            $record['youtube-date'] = $group->match_yt ? $titles[$group->match_yt]['日期'] : '';
+            $record['youtube-title'] = $group->match_yt ? $titles[$group->match_yt]['標題'] : '';
 
             // 計算 crop 區域最常出現的六個標題
             $crop_group = array();
@@ -145,11 +141,8 @@ foreach ($channels as $channel => $channel_data) {
                 $target_file = $target . "/" . $img_file;
                 $crop_file = "crop-{$idx}-{$cidx}.png";
                 $target_crop_file = "{$target}/{$crop_file}";
-                if (!$idx) {
-                    $content .= sprintf("<div><img src='%s'><img src='%s'></div>\n", $img_file, $crop_file);
-                } else {
-                    $content .= sprintf("<div class='lazyload' data-img='%s' data-crop='%s' style='cursor:pointer'> load more </div>\n", $img_file, $crop_file);
-                }
+                $record['img-file'] = $img_file;
+                $record['crop-file'] = $crop_file;
 
                 $chunked_minute_files = array_map(function($f) use ($diff, $files_yt_id) {
                     $bf = basename($f);
@@ -180,8 +173,7 @@ foreach ($channels as $channel => $channel_data) {
                     error_log($cmd);
                     system($cmd);
                 }
-                $content .= sprintf("</div>");
-                return $content;
+                return $record;
             }
         };
 
@@ -286,11 +278,11 @@ foreach ($channels as $channel => $channel_data) {
         }
 
         copy('report.js', $target . '/report.js');
-        $content_template = file_get_contents('report-tmpl.html');
-        $body_content = '';
+        copy('report-tmpl.html', $target . '/index.html');
+        $data = array();
         foreach ($result_groups as $idx => $group) {
-            $body_content .= $draw_group($group, $idx) . "\n";
-            file_put_contents($target . "/index.html", str_replace('{{CONTENT}}', $body_content, $content_template));
+            $data[] = $draw_group($group, $idx);
+            file_put_contents($target . "/data.json", json_encode($data));
         }
     }
 }
