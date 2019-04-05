@@ -1,0 +1,49 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="report.js"></script>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">結果</div>
+        <div class="card-body">
+            <form id="load-config">
+                <textarea></textarea><button type="submit">載入</button>
+            </form>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>開始時間</th>
+                        <th>結束時間</th>
+                        <th>長度</th>
+                        <th>種類</th>
+                        <th>資訊</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">動作區</div>
+        <div class="card-body" id="action-button">
+            <button id="btn-right">新聞開始</button>
+            <button id="btn-like-prev">跟上面一樣</button>
+            <button id="btn-ad">廣告</button>
+            <button id="btn-section-start">開播畫面</button>
+            <button id="btn-section-nexton">開播預告</button>
+            <button id="btn-undo">還原上一動</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            候選影像區
+        </div>
+        <div class="card-body">
+            {{CONTENT}}
+        </div>
+    </div>
+</body>
+</html>
