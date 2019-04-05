@@ -37,7 +37,7 @@ $(function(){
 
                     $('#video').append(div_dom);
                 }
-
+                loadmore();
         });
 
         var get_time_string = function(n){
@@ -125,7 +125,6 @@ $(function(){
             group_dom.addClass('done').hide();
         }
 
-        loadmore();
 
         var replay_actions = function(action_logs){
             $('tbody').html('');
