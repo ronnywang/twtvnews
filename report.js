@@ -1,7 +1,7 @@
 $(function(){
         // 先把前兩張圖都打開
         var loadmore = function(){
-            $('.group:not(.done):lt(4)').each(function(){
+            $('.group:visible:not(.done):lt(4)').each(function(){
                 $('.lazyload', this).each(function(){
                     var lazyload_dom = $(this);
                     lazyload_dom.html($('<img>').attr('src', lazyload_dom.data('img')));
@@ -12,10 +12,13 @@ $(function(){
         };
 
 
+        var videos = {};
         $.get('data.json', function(records){
                 for (var i = 0; i < records.length; i ++) {
                     var record = records[i];
                     var div_dom = $('<div></div>').addClass('group');
+
+                    videos[record.start] = record;
                     div_dom.data('start', record.start);
                     div_dom.data('end', record.end);
                     div_dom.data('youtube-id', record['youtube-id']);
@@ -120,10 +123,15 @@ $(function(){
             }
 
             group_dom.addClass('done').hide();
-            loadmore();
         }
 
         loadmore();
+
+        var replay_actions = function(action_logs){
+            $('tbody').html('');
+            $('.group').removeClass('done').show();
+            action_logs.map(do_action);
+        };
 
         $('#action-button button').click(function(e){
             e.preventDefault();
@@ -131,22 +139,19 @@ $(function(){
             var action = button_dom.attr('id');
             if (action == 'btn-undo') {
                 action_logs.pop();
-                $('tbody').html('');
-                $('.group').removeClass('done').show();
-                action_logs.map(do_action);
+                replay_actions(action_logs);
             } else {
                 action_logs.push(action);
                 do_action(action);
             }
+            loadmore();
             $('textarea').val(JSON.stringify(action_logs));
         });
 
         $('#load-config').submit(function(e){
             e.preventDefault();
             action_logs = JSON.parse($('textarea', this).val());
-            $('tbody').html('');
-            $('.group').removeClass('done').show();
-            action_logs.map(do_action);
+            replay_actions(action_logs);
             loadmore();
         });
 });
