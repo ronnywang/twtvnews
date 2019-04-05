@@ -41,6 +41,9 @@ foreach ($channels as $channel => $channel_data) {
 
     foreach (glob("diffs/{$channel}/*.ts.csv") as $diff_file) {
         $yyyymmdd = explode('.', basename($diff_file))[0];
+        if ($_SERVER['argv'][1] and $_SERVER['argv'][1] != "{$channel}/{$yyyymmdd}") {
+            continue;
+        }
 
         $match_file = "match-result/{$channel}/{$yyyymmdd}.ts.csv";
         if (!file_exists($match_file)) {
