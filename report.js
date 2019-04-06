@@ -21,6 +21,19 @@ $(function(){
             $('input[name="title"]', edit_tr_dom).val(record['標題'] + '(' + record['影片ID'] + ')');
         });
 
+        $('tbody').on('click', 'button.button-split', function(e){
+            e.preventDefault();
+            var button_dom = $(this);
+            var action = ['split', button_dom.data('origin-start'), button_dom.data('new-start')];
+
+            var edit_tr_dom = $(this).parents('tr');
+            edit_tr_dom.remove();
+
+            action_logs.push(action);
+            do_action(action);
+            $('textarea').val(JSON.stringify(action_logs));
+        });
+
         $('tbody').on('keyup', 'input[name="title"]', function(e){
                 var text = $(this).val();
                 var records = youtube_records.filter(function(r) {
@@ -74,9 +87,12 @@ $(function(){
 
             td_dom.append(form_dom);
 
-            data.map(function(i){
+            data.map(function(i, idx){
                 var div_dom = $('<div></div>');
                 var record = videos[i];
+                if (idx) {
+                    div_dom.append($('<button></button>').text('從這拆開').addClass('button-split').data('origin-start', data[0]).data('new-start', i));
+                }
                 div_dom.append($('<div></div>').append($('<img>').attr('src', record['img-file'])).append($('<img>').attr('src', record['crop-file'])));
                 td_dom.append(div_dom);
             });
@@ -240,6 +256,31 @@ $(function(){
                 tr_dom.append($('<td></td>').text('開播畫面'));
                 tr_dom.append($('<td></td>').text(''));
                 $('tbody').append(tr_dom);
+            } else if (action == 'split') {
+                var origin_start = action_params[0];
+                var new_start = action_params[1];
+                var old_tr_dom = $('tbody #group-' + origin_start);
+                var members = old_tr_dom.data('members');
+                var start = origin_start;
+                var end = old_tr_dom.data('end');
+                old_tr_dom.data('end', new_start - 1);
+                old_tr_dom.data('members', members.filter(function(s) { return s < new_start; }));
+                $('td', old_tr_dom).eq(1).text(get_time_string(new_start - 1));
+                $('td', old_tr_dom).eq(2).text(new_start - origin_start);
+
+                var tr_dom = $('<tr></tr>').addClass('section');
+                tr_dom.attr('id', 'group-' + new_start);
+                tr_dom.data('start', new_start)
+                    .data('end', end)
+                    .data('type', old_tr_dom.data('type'))
+                    .data('members', members.filter(function(s) { return s >= new_start; }))
+                ;
+                tr_dom.append($('<td></td>').text(get_time_string(new_start)));
+                tr_dom.append($('<td></td>').text(get_time_string(end)));
+                tr_dom.append($('<td></td>').text(end - new_start + 1));
+                tr_dom.append($('<td></td>').text('新聞段落'));
+                tr_dom.append($('<td></td>').text(''));
+                tr_dom.insertAfter(old_tr_dom);
             } else if (action == 'set-title') {
                 var start = action_params[0];
                 var title = action_params[1];
