@@ -5,13 +5,7 @@
 // 2. 將 screens/ 下的完整截圖取出主標題的部份 存到 crops/ 下
 // 3. 將主標題部份每秒做比對，成果存在 diffs/ 下
 // 成果可見 https://ronnywang.github.io/twnews-demo/
-$channels = array(
-    'ctitv' => array('crop' => '325x25+100+190'),
-    'ebc' => array('crop' => '426x24+0+192'),
-    'formosa' => array('crop' => '328x24+98+192'),
-    'set' => array('crop' => '334x28+92+188'),
-    'tvbs' => array('crop' => '292x23+106+191'),
-);
+include("config.php");
 
 $output = fopen('php://output', 'w');
 
