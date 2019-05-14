@@ -18,6 +18,15 @@ $channels = array(
 );
 
 if (!in_array(date('H'), array('11', '12', '17', '18', '19'))) {
+    if (date('H') == 14 or date('H') == 21) {
+        chdir(__DIR__);
+        system("php count-fullscreen.php");
+    }
+    if (date('H') == 20) {
+        chdir(__DIR__);
+        system("php get-youtube-video.php");
+        system("php youtube-crop.php");
+    }
     exit;
 }
 foreach ($channels as $id => $url) {
@@ -36,3 +45,6 @@ foreach ($channels as $id => $url) {
     exit;
 }
 
+chdir(__DIR__);
+system("php get-youtube-video.php");
+system("php youtube-crop.php");
