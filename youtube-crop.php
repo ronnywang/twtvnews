@@ -8,6 +8,12 @@
 include("config.php");
 
 foreach ($channels as $channel_id => $channel_data) {
+    if (isset($_SERVER['argv'][1]) and $_SERVER['argv'][1] != $channel_id) {
+        continue;
+    } elseif (!isset($_SERVER['argv'][1]) and in_arraY($channel_id, array('formosa', 'ebc', 'tvbs'))) {
+        continue;
+    }
+
     $youtube_dir = __DIR__ . '/youtubes/' . $channel_id;
     $ytcrop_dir = __DIR__ . '/ytcrops/' . $channel_id;
     if (!file_exists($ytcrop_dir)) {
@@ -15,9 +21,17 @@ foreach ($channels as $channel_id => $channel_data) {
     }
     foreach (glob($youtube_dir .'/*') as $youtube_date_dir) {
         $date = basename($youtube_date_dir);
+        if (isset($_SERVER['argv'][2]) and $_SERVER['argv'][2] != $date) {
+            continue;
+        }
         $fp = fopen($youtube_date_dir . '/list.csv', 'r');
+        $showed = array();
         while ($line = fgets($fp)) {
             list($id, $title) = explode(',', trim($line), 2);
+            if (array_key_exists($id, $showed)) {
+                continue;
+            }
+            $showed[$id] = true;
             $ts_file = $youtube_date_dir . '/' . $id . '.ts';
             $ytcrop_date_dir = $ytcrop_dir . '/' . $date;
             $crop_dir = $ytcrop_date_dir . '/crop-' . $id;
